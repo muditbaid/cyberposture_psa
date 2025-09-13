@@ -6,6 +6,14 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
+// Serve static files (including index.html)
+app.use(express.static('.'));
+
+// Route for the root path
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
+
 // --- Database of over 60 questions ---
 const questionDatabase = {
     "Identity & Access Management": [
@@ -91,6 +99,9 @@ function shuffleArray(array) {
     }
 }
 
+// Store assessments in memory (in production, use a database)
+const assessments = {};
+
 // API endpoint to start an assessment and get randomized questions
 app.post('/api/assessment/start', (req, res) => {
     const { name, email } = req.body;
@@ -103,8 +114,16 @@ app.post('/api/assessment/start', (req, res) => {
         questionsForAssessment[category] = questionDatabase[category].slice(0, questionsPerCategory);
     }
 
+    const assessmentId = Date.now();
+    
+    // Store the assessment questions for later scoring
+    assessments[assessmentId] = {
+        questions: questionsForAssessment,
+        user: { name, email }
+    };
+
     res.json({
-        assessmentId: Date.now(),
+        assessmentId: assessmentId,
         user: { name, email },
         questions: questionsForAssessment
     });
@@ -112,7 +131,19 @@ app.post('/api/assessment/start', (req, res) => {
 
 // API endpoint to submit answers and get the report
 app.post('/api/assessment/submit', (req, res) => {
-    const { answers, assessmentId, userName } = req.body;
+    try {
+        const { answers, assessmentId, userName } = req.body;
+        
+        console.log('Submitting assessment:', { assessmentId, userName, answersCount: Object.keys(answers).length });
+        
+        // Get the stored assessment questions
+        const assessment = assessments[assessmentId];
+        if (!assessment) {
+            console.error('Assessment not found:', assessmentId);
+            return res.status(404).json({ error: 'Assessment not found' });
+        }
+        
+        const assessmentQuestions = assessment.questions;
     
     let totalScore = 0;
     const totalPossibleScore = 600; // 60 questions * max score of 10
@@ -125,7 +156,7 @@ app.post('/api/assessment/submit', (req, res) => {
         let categoryMaxScore = 0;
         
         answers[category].forEach((answer, index) => {
-            const question = questionDatabase[category][index];
+            const question = assessmentQuestions[category][index];
             const scoreValue = question.score[answer];
             categoryScore += scoreValue;
             totalScore += scoreValue;
@@ -156,17 +187,23 @@ app.post('/api/assessment/submit', (req, res) => {
     if (overallScore < 80) riskLevel = 'Medium Risk';
     if (overallScore < 50) riskLevel = 'High Risk';
 
-    const report = {
-        assessmentId,
-        userName,
-        overallScore,
-        riskLevel,
-        categoryScores,
-        recommendations,
-        dateCompleted: new Date().toLocaleDateString()
-    };
+        const report = {
+            assessmentId,
+            userName,
+            overallScore,
+            riskLevel,
+            categoryScores,
+            recommendations,
+            dateCompleted: new Date().toLocaleDateString()
+        };
 
-    res.json(report);
+        console.log('Assessment completed successfully:', { assessmentId, overallScore, riskLevel });
+        res.json(report);
+        
+    } catch (error) {
+        console.error('Error processing assessment submission:', error);
+        res.status(500).json({ error: 'Internal server error', details: error.message });
+    }
 });
 
 app.listen(PORT, () => {

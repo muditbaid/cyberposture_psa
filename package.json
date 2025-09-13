@@ -17,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/muditbaid/cyberposture_psa/issues"
   },
-  "homepage": "https://github.com/muditbaid/cyberposture_psa#readme"
+  "homepage": "https://github.com/muditbaid/cyberposture_psa#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
+  }
 }

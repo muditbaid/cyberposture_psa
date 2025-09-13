@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CyberShield PSA - Personal Security Assessment</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -736,12 +737,20 @@
         };
 
         function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('active');
+            document.querySelectorAll('.slide').forEach(slide => {
+                slide.classList.remove('active');
             });
             document.getElementById(screenId).classList.add('active');
             state.currentScreen = screenId;
             updateStepIndicator(screenId);
+            
+            // Show navigation for question screen
+            const navigation = document.querySelector('.navigation');
+            if (screenId === 'slide-2') {
+                navigation.classList.remove('hidden');
+            } else {
+                navigation.classList.add('hidden');
+            }
         }
 
         function updateStepIndicator(screenId) {
@@ -783,117 +792,59 @@
         }
 
         function initializeWelcomeScreen() {
-            document.getElementById('welcome-continue-btn').addEventListener('click', () => {
-                showScreen('disclaimer-screen');
+            document.getElementById('start-assessment-btn').addEventListener('click', async () => {
+                // Start the assessment by fetching questions
+                try {
+                    const response = await fetch('http://localhost:3000/api/assessment/start', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ 
+                            name: 'User', // Default name for now
+                            email: 'user@example.com' // Default email for now
+                        })
+                    });
+                    const data = await response.json();
+                    
+                    questionsForAssessment = data.questions;
+                    assessmentId = data.assessmentId;
+
+                    // Initialize state for the new assessment
+                    state.answers = {};
+                    state.categoryScores = {};
+                    state.totalScore = 0;
+                    state.categoryIndex = 0;
+                    state.currentQuestionIndex = 0;
+                    
+                    loadQuestion();
+                    showScreen('slide-2');
+                } catch (error) {
+                    console.error('Error starting assessment:', error);
+                    alert('Error starting assessment. Please try again.');
+                }
             });
         }
 
+        // Commented out unused screen functions since current HTML uses slide system
         function initializeDisclaimerScreen() {
-            const disclaimerCheckbox = document.getElementById('disclaimer-checkbox');
-            const continueBtn = document.getElementById('disclaimer-continue-btn');
-            
-            disclaimerCheckbox.addEventListener('change', () => {
-                state.acceptedDisclaimer = disclaimerCheckbox.checked;
-                continueBtn.disabled = !disclaimerCheckbox.checked;
-            });
-            
-            document.getElementById('disclaimer-back-btn').addEventListener('click', () => {
-                showScreen('welcome-screen');
-            });
-            
-            continueBtn.addEventListener('click', () => {
-                showScreen('terms-screen');
-            });
+            // All elements referenced here don't exist in the current HTML
+            return;
         }
 
         function initializeTermsScreen() {
-            const termsCheckbox = document.getElementById('terms-checkbox');
-            const continueBtn = document.getElementById('terms-continue-btn');
-            
-            termsCheckbox.addEventListener('change', () => {
-                state.acceptedTerms = termsCheckbox.checked;
-                continueBtn.disabled = !termsCheckbox.checked;
-            });
-            
-            document.getElementById('terms-back-btn').addEventListener('click', () => {
-                showScreen('disclaimer-screen');
-            });
-            
-            continueBtn.addEventListener('click', () => {
-                showScreen('subscription-screen');
-            });
+            // All elements referenced here don't exist in the current HTML
+            return;
         }
 
         function initializeSubscriptionScreen() {
-            const continueBtn = document.getElementById('subscription-continue-btn');
-            
-            document.querySelectorAll('.free-plan-btn, .premium-plan-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.subscription-card').forEach(card => {
-                        card.classList.remove('selected');
-                    });
-                    this.closest('.subscription-card').classList.add('selected');
-                    
-                    if (this.classList.contains('free-plan-btn')) {
-                        state.selectedPlan = 'free';
-                    } else {
-                        state.selectedPlan = 'premium';
-                    }
-                    
-                    continueBtn.disabled = false;
-                });
-            });
-            
-            document.getElementById('subscription-back-btn').addEventListener('click', () => {
-                showScreen('terms-screen');
-            });
-            
-            continueBtn.addEventListener('click', () => {
-                showScreen('details-screen');
-            });
+            // All elements referenced here don't exist in the current HTML
+            return;
         }
 
         function initializeDetailsScreen() {
-            const userNameInput = document.getElementById('user-name-input');
-            const continueBtn = document.getElementById('details-continue-btn');
-            
-            userNameInput.addEventListener('input', () => {
-                state.userName = userNameInput.value.trim();
-                continueBtn.disabled = !userNameInput.value.trim();
-            });
-            
-            document.getElementById('user-email-input').addEventListener('input', () => {
-                state.userEmail = document.getElementById('user-email-input').value.trim();
-            });
-            
-            document.getElementById('details-back-btn').addEventListener('click', () => {
-                showScreen('subscription-screen');
-            });
-            
-            continueBtn.addEventListener('click', async () => {
-                // Fetch questions from the backend
-                const response = await fetch('http://localhost:3000/api/assessment/start', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ name: state.userName, email: state.userEmail })
-                });
-                const data = await response.json();
-                
-                questionsForAssessment = data.questions;
-                assessmentId = data.assessmentId;
-
-                // Initialize state for the new assessment
-                state.answers = {};
-                state.categoryScores = {};
-                state.totalScore = 0;
-                state.categoryIndex = 0;
-                state.currentQuestionIndex = 0;
-                
-                loadQuestion();
-                showScreen('question-screen');
-            });
+            // All elements referenced here don't exist in the current HTML
+            return;
         }
 
         function loadQuestion() {
@@ -902,24 +853,17 @@
             const questions = questionsForAssessment[currentCategory];
             const question = questions[state.currentQuestionIndex];
             
-            document.getElementById('category-title').textContent = currentCategory;
-            document.getElementById('question-number').textContent = `${state.currentQuestionIndex + 1} of ${questions.length}`;
+            document.getElementById('question-counter').textContent = `Question ${state.currentQuestionIndex + 1} of ${questions.length}`;
             document.getElementById('question-text').textContent = question.text;
-            document.getElementById('question-description').textContent = question.description;
             
-            const totalQuestions = Object.values(questionsForAssessment).reduce((total, cat) => total + cat.length, 0);
-            const questionsAnswered = Object.values(state.answers).reduce((total, cat) => total + Object.keys(cat).length, 0);
-            const progressPercent = (questionsAnswered / totalQuestions) * 100;
+            // Progress tracking removed since progress elements don't exist in slide-2
             
-            document.getElementById('progress-percent').textContent = `${Math.round(progressPercent)}%`;
-            document.getElementById('progress-fill').style.width = `${progressPercent}%`;
-            
-            const answerOptionsContainer = document.getElementById('answer-options');
+            const answerOptionsContainer = document.getElementById('options-container');
             answerOptionsContainer.innerHTML = '';
             
             question.answerOptions.forEach(option => {
                 const button = document.createElement('button');
-                button.className = 'answer-btn';
+                button.className = 'option-btn';
                 
                 const scoreOption = Object.keys(question.score).find(key => key === option);
                 if (scoreOption) {
@@ -942,7 +886,7 @@
                 `;
                 
                 button.addEventListener('click', () => {
-                    document.querySelectorAll('.answer-btn').forEach(btn => btn.classList.remove('selected'));
+                    document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
                     button.classList.add('selected');
                     
                     if (!state.answers[currentCategory]) {
@@ -950,19 +894,31 @@
                     }
                     state.answers[currentCategory][state.currentQuestionIndex] = option;
                     
-                    document.getElementById('next-btn').disabled = false;
+                    const nextBtn = document.getElementById('next-btn');
+                    if (nextBtn) nextBtn.disabled = false;
                 });
                 
                 answerOptionsContainer.appendChild(button);
             });
             
-            document.getElementById('prev-btn').disabled = (state.categoryIndex === 0 && state.currentQuestionIndex === 0);
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            if (prevBtn) prevBtn.disabled = (state.categoryIndex === 0 && state.currentQuestionIndex === 0);
             const isAnswered = state.answers[currentCategory] && state.answers[currentCategory][state.currentQuestionIndex] !== undefined;
-            document.getElementById('next-btn').disabled = !isAnswered;
+            if (nextBtn) nextBtn.disabled = !isAnswered;
         }
 
         function initializeQuestionScreen() {
-            document.getElementById('prev-btn').addEventListener('click', () => {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            if (!prevBtn || !nextBtn) {
+                console.warn('Navigation buttons not found, skipping initialization');
+                return;
+            }
+            
+            prevBtn.addEventListener('click', () => {
                 if (state.currentQuestionIndex > 0) {
                     state.currentQuestionIndex--;
                     loadQuestion();
@@ -973,7 +929,7 @@
                 }
             });
             
-            document.getElementById('next-btn').addEventListener('click', async () => {
+            nextBtn.addEventListener('click', async () => {
                 const categories = Object.keys(questionsForAssessment);
                 const currentCategory = categories[state.categoryIndex];
                 const questions = questionsForAssessment[currentCategory];
@@ -1004,105 +960,85 @@
                 }
             });
             
-            document.getElementById('exit-assessment-btn').addEventListener('click', () => {
-                showScreen('welcome-screen');
-            });
+            const exitBtn = document.getElementById('exit-assessment-btn');
+            if (exitBtn) {
+                exitBtn.addEventListener('click', () => {
+                    showScreen('slide-1');
+                });
+            }
         }
 
         function generateReport(reportData) {
             const { overallScore, riskLevel, categoryScores, recommendations, dateCompleted, userName } = reportData;
             
-            document.getElementById('report-user-name').textContent = userName;
-            document.getElementById('report-date').textContent = `Generated on ${dateCompleted}`;
-            document.getElementById('report-completion-date').textContent = dateCompleted;
-            
-            const overallScoreElement = document.getElementById('overall-score-circle');
-            overallScoreElement.textContent = `${overallScore}%`;
-            
-            let riskClass = 'score-low';
-            if (overallScore < 80) riskClass = 'score-medium';
-            if (overallScore < 50) riskClass = 'score-high';
-            
-            overallScoreElement.className = `score-circle ${riskClass} mx-auto mb-4`;
-            
-            const riskLevelElement = document.getElementById('risk-level');
-            riskLevelElement.textContent = riskLevel;
-            let riskBadgeClass = 'risk-low';
-            if (overallScore < 80) riskBadgeClass = 'risk-medium';
-            if (overallScore < 50) riskBadgeClass = 'risk-high';
-            riskLevelElement.className = `risk-badge ${riskBadgeClass}`;
-            
-            const categoryScoresContainer = document.getElementById('category-scores');
-            categoryScoresContainer.innerHTML = '';
-            
-            for (const category in categoryScores) {
-                const scoreData = categoryScores[category];
-                const percentScore = scoreData.score;
+            // Update score display
+            const scoreDisplay = document.getElementById('score-display');
+            if (scoreDisplay) {
+                scoreDisplay.textContent = `${overallScore}%`;
                 
-                let categoryRisk, categoryRiskClass;
-                if (percentScore >= 80) {
-                    categoryRisk = "Low Risk";
-                    categoryRiskClass = "risk-low";
-                } else if (percentScore >= 50) {
-                    categoryRisk = "Medium Risk";
-                    categoryRiskClass = "risk-medium";
+                // Add appropriate CSS class based on score
+                scoreDisplay.className = 'result-score mb-4';
+                if (overallScore < 50) {
+                    scoreDisplay.classList.add('score-bad');
+                } else if (overallScore < 80) {
+                    scoreDisplay.classList.add('score-ok');
                 } else {
-                    categoryRisk = "High Risk";
-                    categoryRiskClass = "risk-high";
+                    scoreDisplay.classList.add('score-good');
                 }
-                
-                const scoreBar = document.createElement('div');
-                scoreBar.className = 'mb-3';
-                scoreBar.innerHTML = `
-                    <div class="flex justify-between mb-1">
-                        <span class="text-sm">${category}</span>
-                        <span class="text-sm font-medium">${percentScore}%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${percentScore}%"></div>
-                    </div>
-                    <div class="text-right mt-1">
-                        <span class="risk-badge ${categoryRiskClass}">${categoryRisk}</span>
-                    </div>
-                `;
-                categoryScoresContainer.appendChild(scoreBar);
             }
             
-            const recommendationsContainer = document.getElementById('recommendations-list');
-            recommendationsContainer.innerHTML = '';
+            // Update score comment
+            const scoreComment = document.getElementById('score-comment');
+            if (scoreComment) {
+                scoreComment.textContent = `Risk Level: ${riskLevel}`;
+            }
             
-            recommendations.forEach(rec => {
-                const recommendationCard = document.createElement('div');
-                recommendationCard.className = `recommendation-card ${rec.priority.toLowerCase()}`;
-                recommendationCard.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="font-semibold text-lg mb-2">Improve Your ${rec.category}</h3>
-                            <p class="text-gray-700">Detailed recommendations for this category.</p>
-                        </div>
-                        <span class="risk-badge ${rec.priority.toLowerCase()}">${rec.priority}</span>
-                    </div>
-                `;
-                recommendationsContainer.appendChild(recommendationCard);
-            });
+            // Update recommendations list
+            const recommendationsContainer = document.getElementById('recommendations-list');
+            if (recommendationsContainer) {
+                recommendationsContainer.innerHTML = '';
+                
+                if (recommendations.length === 0) {
+                    recommendationsContainer.innerHTML = `
+                        <li class="bullet-point">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Congratulations! You have a great cybersecurity posture. Continue to stay informed about new threats.</span>
+                        </li>
+                    `;
+                } else {
+                    recommendations.forEach(rec => {
+                        const recommendationItem = document.createElement('li');
+                        recommendationItem.className = 'bullet-point';
+                        recommendationItem.innerHTML = `
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Improve your ${rec.category} - Priority: ${rec.priority}</span>
+                        `;
+                        recommendationsContainer.appendChild(recommendationItem);
+                    });
+                }
+            }
+
+            // Add restart button functionality
+            const restartBtn = document.getElementById('restart-btn');
+            if (restartBtn) {
+                restartBtn.addEventListener('click', () => {
+                    showScreen('slide-1');
+                });
+            }
 
             // Display the report screen
-            showScreen('report-screen');
+            showScreen('slide-3');
         }
 
         // Initialize chatbot and UI
         function initializeChatbot() {
-            // ... (same as previous chatbot code, no changes needed) ...
+            // Commented out - not implemented in current version
+            return;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             initializeWelcomeScreen();
-            initializeDisclaimerScreen();
-            initializeTermsScreen();
-            initializeSubscriptionScreen();
-            initializeDetailsScreen();
-            initializeCategorySelectionScreen();
             initializeQuestionScreen();
-            initializeChatbot();
+            // Removed other screen initializations since they don't exist in the current HTML
         });
     </script>
