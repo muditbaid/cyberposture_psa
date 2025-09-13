@@ -1,0 +1,21 @@
+{
+  "name": "cyberposture_psa",
+  "version": "1.0.0",
+  "description": "Personal Security Assessment App for Individuals and Enterprise",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muditbaid/cyberposture_psa.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/muditbaid/cyberposture_psa/issues"
+  },
+  "homepage": "https://github.com/muditbaid/cyberposture_psa#readme"
+}
