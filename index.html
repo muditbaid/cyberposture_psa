@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberShield PSA - Personal Security Assessment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+        }
+
+        .slide {
+            display: none;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 1200px;
+            min-height: 600px;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        .slide-number {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 1rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .bullet-point {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .bullet-point i {
+            color: var(--primary);
+            margin-right: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .stat-box {
+            background: #f8fafc;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary);
+            height: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.75rem;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+
+        .contact-info {
+            display: flex;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .contact-info i {
+            color: var(--primary);
+            margin-right: 0.5rem;
+        }
+
+        .option-btn {
+            background-color: #f3f4f6;
+            color: #1f2937;
+            border: 2px solid #e5e7eb;
+            padding: 1rem;
+            width: 100%;
+            text-align: left;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover {
+            background-color: #e5e7eb;
+        }
+
+        .option-btn.correct {
+            background-color: var(--success);
+            color: white;
+            border-color: var(--success);
+            pointer-events: none;
+        }
+
+        .option-btn.incorrect {
+            background-color: var(--danger);
+            color: white;
+            border-color: var(--danger);
+            pointer-events: none;
+        }
+
+        .option-btn.correct:hover, .option-btn.incorrect:hover {
+            background-color: var(--success);
+        }
+
+        .result-score {
+            font-size: 5rem;
+            font-weight: bold;
+        }
+
+        .score-good { color: #10b981; }
+        .score-ok { color: #f59e0b; }
+        .score-bad { color: #ef4444; }
+
+        .start-btn {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            border-radius: 0.75rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .start-btn:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body class="min-h-screen py-8">
+    <div class="container mx-auto px-4">
+        <div id="slide-1" class="slide active relative">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-alt text-white text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-600">CyberShield PSA</h1>
+            </div>
+
+            <div class="text-center mt-16">
+                <h1 class="text-5xl font-bold text-gray-800 mb-6">CyberShield PSA</h1>
+                <h2 class="text-3xl text-blue-600 font-semibold mb-8">Personal Security Assessment Platform</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-12">Empowering individuals to understand and improve their cybersecurity posture</p>
+                <button id="start-assessment-btn" class="start-btn">Start Assessment <i class="fas fa-arrow-right ml-2"></i></button>
+            </div>
+
+            <div class="slide-number">1</div>
+        </div>
+
+        <div id="slide-2" class="slide relative">
+            <h2 id="question-counter" class="text-2xl font-bold text-blue-600 mb-4">Question 1 of 10</h2>
+            <p id="question-text" class="text-3xl font-semibold text-gray-800 mb-8">Loading question...</p>
+            <div id="options-container" class="grid gap-4">
+                </div>
+            <div id="explanation-box" class="mt-8 p-4 bg-gray-100 rounded-lg hidden">
+                <h3 class="font-bold text-lg mb-2 text-gray-800">Explanation:</h3>
+                <p id="explanation-text" class="text-gray-600"></p>
+            </div>
+            <div class="slide-number">2</div>
+        </div>
+
+        <div id="slide-3" class="slide text-center relative">
+            <h2 class="text-4xl font-bold text-gray-800 mb-8">Your Assessment Results</h2>
+            <div id="score-display" class="result-score mb-4">0%</div>
+            <p id="score-comment" class="text-2xl font-semibold mb-8 text-gray-700"></p>
+            <div class="flex justify-center items-center mb-8">
+                <i id="score-icon" class="fas fa-shield-alt text-6xl"></i>
+            </div>
+            <div class="bg-gray-50 p-6 rounded-xl text-left">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Recommendations:</h3>
+                <ul id="recommendations-list" class="space-y-3 text-gray-600">
+                    <li class="bullet-point">
+                        <i class="fas fa-arrow-right"></i>
+                        <span>Congratulations! You have a great cybersecurity posture. Continue to stay informed about new threats.</span>
+                    </li>
+                </ul>
+            </div>
+            <button id="restart-btn" class="start-btn mt-8">Start New Assessment <i class="fas fa-redo ml-2"></i></button>
+            <div class="slide-number">3</div>
+        </div>
+
+        <div id="slide-4" class="slide">
+            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">The Cybersecurity Problem</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="stat-box">
+                    <div class="stat-number">85%</div>
+                    <p class="text-gray-700">of breaches involve human elements</p>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">74%</div>
+                    <p class="text-gray-700">of breaches include the human element</p>
+                </div>
+            </div>
+            <div class="bg-red-50 p-6 rounded-xl border-l-4 border-red-500 mb-8">
+                <h3 class="text-xl font-semibold text-red-800 mb-4">The Growing Threat Landscape</h3>
+                <ul class="space-y-2">
+                    <li class="bullet-point">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Cyber attacks increased by 125% globally in 2021</span>
+                    </li>
+                    <li class="bullet-point">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Average cost of a data breach reached $4.35 million in 2022</span>
+                    </li>
+                    <li class="bullet-point">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Most individuals lack awareness of basic security practices</span>
+                    </li>
+                    <li class="bullet-point">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>No standardized way to measure personal cybersecurity posture</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="slide-number">4</div>
+        </div>
+        <div id="slide-5" class="slide">
+            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Our Solution: CyberShield PSA</h2>
+            <div class="flex items-center justify-center mb-8">
+                <div class="bg-blue-100 p-4 rounded-full mr-6">
+                    <i class="fas fa-shield-alt text-blue-600 text-4xl"></i>
+                </div>
+                <p class="text-2xl text-gray-700 font-medium">A comprehensive personal security assessment platform that educates while it evaluates</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="feature-card">
+                    <div class="bg-blue-100 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                        <i class="fas fa-clipboard-check text-blue-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Comprehensive Assessment</h3>
+                    <p class="text-gray-600">26 questions across 4 security domains to evaluate personal cybersecurity posture</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="bg-green-100 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                        <i class="fas fa-chart-pie text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Detailed Reporting</h3>
+                    <p class="text-gray-600">Personalized reports with actionable recommendations based on assessment results</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="bg-purple-100 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                        <i class="fas fa-graduation-cap text-purple-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Educational Content</h3>
+                    <p class="text-gray-600">Built-in explanations and guidance to improve security knowledge and practices</p>
+                </div>
+            </div>
+            <div class="slide-number">5</div>
+        </div>
+        <div id="slide-6" class="slide">
+            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">How CyberShield PSA Works</h2>
+
+            <div class="flex justify-center mb-10">
+                <div class="relative">
+                    <div class="flex items-center justify-between space-x-8">
+                        <div class="text-center">
+                            <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <span class="text-blue-600 font-bold text-xl">1</span>
+                            </div>
+                            <p class="font-medium">Assessment</p>
+                        </div>
+
+                        <div class="text-center">
+                            <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <span class="text-blue-600 font-bold text-xl">2</span>
+                            </div>
+                            <p class="font-medium">Analysis</p>
+                        </div>
+
+                        <div class="text-center">
+                            <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <span class="text-blue-600 font-bold text-xl">3</span>
+                            </div>
+                            <p class="font-medium">Report</p>
+                        </div>
+
+                        <div class="text-center">
+                            <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <span class="text-blue-600 font-bold text-xl">4</span>
+                            </div>
+                            <p class="font-medium">Action</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gray-50 p-6 rounded-xl">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Assessment Process</h3>
+                    <ul class="space-y-3">
+                        <li class="bullet-point">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Users complete a 15-minute assessment</span>
+                        </li>
+                        <li class="bullet-point">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Questions cover identity management, data protection, device security, and online behavior</span>
+                        </li>
+                        <li class="bullet-point">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Real-time explanations help users understand why each question matters</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Results & Recommendations</h3>
+                    <ul class="space-y-3">
+                        <li class="bullet-point">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Comprehensive scoring system evaluates security posture</span>
+                        </li>
+                        <li class="bullet-point">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Personalized action items with priority levels</span>
+                        </li>
+                        <li class="bullet-point">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Ongoing tracking of improvements over time</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="slide-number">6</div>
+        </div>
+        <div id="slide-7" class="slide">
+            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Target Market & Applications</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6">Primary Users</h3>
+
+                    <div class="bg-blue-50 p-5 rounded-xl mb-6">
+                        <h4 class="text-lg font-semibold text-blue-800 mb-3">Individual Consumers</h4>
+                        <ul class="space-y-2">
+                            <li class="bullet-point">
+                                <i class="fas fa-user"></i>
+                                <span>Privacy-conscious individuals</span>
+                            </li>
+                            <li class="bullet-point">
+                                <i class="fas fa-house-user"></i>
+                                <span>Remote workers</span>
+                            </li>
+                            <li class="bullet-point">
+                                <i class="fas fa-users"></i>
+                                <span>Families concerned about online safety</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-green-50 p-5 rounded-xl">
+                        <h4 class="text-lg font-semibold text-green-800 mb-3">Business Applications</h4>
+                        <ul class="space-y-2">
+                            <li class="bullet-point">
+                                <i class="fas fa-briefcase"></i>
+                                <span>Employee security training</span>
+                            </li>
+                            <li class="bullet-point">
+                                <i class="fas fa-laptop-house"></i>
+                                <span>Remote work security policies</span>
+                            </li>
+                            <li class="bullet-point">
+                                <i class="fas fa-hand-holding-usd"></i>
+                                <span>Insurance risk assessment</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6">Market Size & Opportunity</h3>
+
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="bg-purple-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-chart-line text-purple-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800">Growing Cybersecurity Market</h4>
+                                <p class="text-gray-600">Global cybersecurity market projected to reach $500 billion by 2030</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="bg-orange-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-user-friends text-orange-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800">Increasing Awareness</h4>
+                                <p class="text-gray-600">78% of people are more concerned about cybersecurity than 5 years ago</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="bg-teal-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-mobile-alt text-teal-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800">Digital Lifestyle Expansion</h4>
+                                <p class="text-gray-600">Average person has 100+ online accounts requiring security</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-number">7</div>
+        </div>
+        <div id="slide-8" class="slide">
+            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Competitive Advantage</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="feature-card">
+                    <div class="bg-blue-100 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                        <i class="fas fa-brain text-blue-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">AI-Powered Insights</h3>
+                    <p class="text-gray-600">Proprietary algorithm provides personalized recommendations based on assessment data</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="bg-green-100 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                        <i class="fas fa-robot text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Integrated Chat Assistant</h3>
+                    <p class="text-gray-600">Real-time guidance helps users understand and implement security recommendations</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="bg-purple-100 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                        <i class="fas fa-chart-line text-purple-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Progress Tracking</h3>
+                    <p class="text-gray-600">Dashboard allows users to monitor improvements in their security posture over time</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-6 rounded-xl">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Unique Differentiators</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bullet-point">
+                        <i class="fas fa-star text-yellow-500"></i>
+                        <span>Comprehensive assessment covering both technical and behavioral aspects</span>
+                    </div>
+                    <div class="bullet-point">
+                        <i class="fas fa-star text-yellow-500"></i>
+                        <span>Educational approach that builds security awareness</span>
+                    </div>
+                    <div class="bullet-point">
+                        <i class="fas fa-star text-yellow-500"></i>
+                        <span>Actionable recommendations with priority levels</span>
+                    </div>
+                    <div class="bullet-point">
+                        <i class="fas fa-star text-yellow-500"></i>
+                        <span>Flexible subscription models for different user needs</span>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-number">8</div>
+        </div>
+        <div id="slide-9" class="slide">
+            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Business Model</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="text-center p-6 bg-white rounded-xl shadow-md border border-gray-200">
+                    <div class="bg-blue-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-user text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Freemium Model</h3>
+                    <p class="text-gray-600 mb-4">Basic assessment free for all users</p>
+                    <div class="text-blue-600 font-bold text-2xl">$0</div>
+                </div>
+
+                <div class="text-center p-6 bg-white rounded-xl shadow-md border-2 border-blue-600">
+                    <div class="bg-blue-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-crown text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Premium Individual</h3>
+                    <p class="text-gray-600 mb-4">Detailed reports & ongoing monitoring</p>
+                    <div class="text-blue-600 font-bold text-2xl">$9.99<span class="text-sm font-normal">/mo</span></div>
+                </div>
+
+                <div class="text-center p-6 bg-white rounded-xl shadow-md border border-gray-200">
+                    <div class="bg-blue-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-building text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Enterprise</h3>
+                    <p class="text-gray-600 mb-4">Team management & reporting</p>
+                    <div class="text-blue-600 font-bold text-2xl">$15<span class="text-sm font-normal">/user/mo</span></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-green-50 p-6 rounded-xl">
+                    <h3 class="text-xl font-semibold text-green-800 mb-4">Revenue Streams</h3>
+                    <ul class="space-y-3">
+                        <li class="bullet-point">
+                            <i class="fas fa-money-bill-wave text-green-600"></i>
+                            <span>Subscription fees for premium features</span>
+                        </li>
+                        <li class="bullet-point">
+                            <i class="fas fa-handshake text-green-600"></i>
+                            <span>Enterprise licensing for organizations</span>
+                        </li>
+                        <li class="bullet-point">
+                            <i class="fas fa-certificate text-green-600"></i>
+                            <span>Certification programs for professionals</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-blue-50 p-6 rounded-xl">
+                    <h3 class="text-xl font-semibold text-blue-800 mb-4">Market Strategy</h3>
+                    <ul class="space-y-3">
+                        <li class="bullet-point">
+                            <i class="fas fa-digital-tachograph text-blue-600"></i>
+                            <span>Digital marketing to security-conscious consumers</span>
+                        </li>
+                        <li class="bullet-point">
+                            <i class="fas fa-briefcase text-blue-600"></i>
+                            <span>B2B sales to organizations for employee training</span>
+                        </li>
+                        <li class="bullet-point">
+                            <i class="fas fa-handshake text-blue-600"></i>
+                            <span>Partnerships with cybersecurity insurance providers</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="slide-number">9</div>
+        </div>
+        <div id="slide-10" class="slide">
+            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">The Team</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="text-center">
+                    <div class="bg-blue-100 w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <i class="fas fa-user text-blue-600 text-5xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800">Alex Johnson</h3>
+                    <p class="text-blue-600 font-medium mb-2">CEO & Security Expert</p>
+                    <p class="text-gray-600">Former security lead at Fortune 500 company with 15+ years in cybersecurity</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="bg-green-100 w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <i class="fas fa-user text-green-600 text-5xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800">Sarah Chen</h3>
+                    <p class="text-green-600 font-medium mb-2">CTO & Product Development</p>
+                    <p class="text-gray-600">Software architect with expertise in security applications and AI systems</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-6 rounded-xl">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Advisory Board</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bullet-point">
+                        <i class="fas fa-user-tie text-purple-600"></i>
+                        <span>Dr. Michael Roberts - Cybersecurity Professor</span>
+                    </div>
+                    <div class="bullet-point">
+                        <i class="fas fa-user-tie text-purple-600"></i>
+                        <span>Lisa Rodriguez - Privacy Law Expert</span>
+                    </div>
+                    <div class="bullet-point">
+                        <i class="fas fa-user-tie text-purple-600"></i>
+                        <span>David Kim - Venture Capitalist</span>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-number">10</div>
+        </div>
+        <div id="slide-11" class="slide">
+            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Contact Us</h2>
+
+            <div class="text-center mb-10">
+                <p class="text-xl text-gray-700 max-w-2xl mx-auto">Ready to learn more about how CyberShield PSA can help improve personal cybersecurity awareness?</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6">Get In Touch</h3>
+
+                    <div class="space-y-4">
+                        <div class="contact-info">
+                            <i class="fas fa-globe"></i>
+                            <span>www.cybershield-psa.com</span>
+                        </div>
+
+                        <div class="contact-info">
+                            <i class="fas fa-envelope"></i>
+                            <span>info@cybershield-psa.com</span>
+                        </div>
+
+                        <div class="contact-info">
+                            <i class="fas fa-phone"></i>
+                            <span>+1 (555) 123-4567</span>
+                        </div>
+
+                        <div class="contact-info">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>San Francisco, CA</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6">Request a Demo</h3>
+
+                    <div class="bg-blue-50 p-6 rounded-xl">
+                        <form class="space-y-4">
+                            <div>
+                                <input type="text" placeholder="Full Name" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <input type="email" placeholder="Email Address" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <input type="text" placeholder="Company" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <button class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">Request Demo</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-10">
+                <div class="logo inline-flex">
+                    <div class="logo-icon">
+                        <i class="fas fa-shield-alt text-white text-xl"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold text-blue-600">CyberShield PSA</h1>
+                </div>
+            </div>
+            <div class="slide-number">11</div>
+        </div>
+    </div>
+
+    <div class="navigation hidden">
+        <button id="prev-btn" class="nav-btn">
+            <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button id="next-btn" class="nav-btn">
+            Next <i class="fas fa-arrow-right"></i>
+        </button>
+    </div>
+
+    <script>
+        // Add a global variable to store the questions and assessment ID from the backend
+        let questionsForAssessment = {};
+        let assessmentId = null;
+
+        // The rest of your application state and UI logic
+        const state = {
+            currentScreen: 'welcome-screen',
+            acceptedDisclaimer: false,
+            acceptedTerms: false,
+            selectedPlan: null,
+            userName: '',
+            userEmail: '',
+            currentCategory: '',
+            currentQuestionIndex: 0,
+            answers: {},
+            categoryIndex: 0,
+            totalScore: 0,
+            categoryScores: {}
+        };
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+            state.currentScreen = screenId;
+            updateStepIndicator(screenId);
+        }
+
+        function updateStepIndicator(screenId) {
+            const steps = document.querySelectorAll('.step');
+            steps.forEach(step => step.classList.remove('active', 'completed'));
+            
+            switch(screenId) {
+                case 'welcome-screen':
+                    steps[0].classList.add('active');
+                    break;
+                case 'disclaimer-screen':
+                    steps[0].classList.add('completed');
+                    steps[1].classList.add('active');
+                    break;
+                case 'terms-screen':
+                    steps[0].classList.add('completed');
+                    steps[1].classList.add('completed');
+                    steps[2].classList.add('active');
+                    break;
+                case 'subscription-screen':
+                    steps[0].classList.add('completed');
+                    steps[1].classList.add('completed');
+                    steps[2].classList.add('completed');
+                    steps[3].classList.add('active');
+                    break;
+                case 'details-screen':
+                    steps[0].classList.add('completed');
+                    steps[1].classList.add('completed');
+                    steps[2].classList.add('completed');
+                    steps[3].classList.add('completed');
+                    break;
+                case 'category-selection-screen':
+                    steps[0].classList.add('completed');
+                    steps[1].classList.add('completed');
+                    steps[2].classList.add('completed');
+                    steps[3].classList.add('completed');
+                    break;
+            }
+        }
+
+        function initializeWelcomeScreen() {
+            document.getElementById('welcome-continue-btn').addEventListener('click', () => {
+                showScreen('disclaimer-screen');
+            });
+        }
+
+        function initializeDisclaimerScreen() {
+            const disclaimerCheckbox = document.getElementById('disclaimer-checkbox');
+            const continueBtn = document.getElementById('disclaimer-continue-btn');
+            
+            disclaimerCheckbox.addEventListener('change', () => {
+                state.acceptedDisclaimer = disclaimerCheckbox.checked;
+                continueBtn.disabled = !disclaimerCheckbox.checked;
+            });
+            
+            document.getElementById('disclaimer-back-btn').addEventListener('click', () => {
+                showScreen('welcome-screen');
+            });
+            
+            continueBtn.addEventListener('click', () => {
+                showScreen('terms-screen');
+            });
+        }
+
+        function initializeTermsScreen() {
+            const termsCheckbox = document.getElementById('terms-checkbox');
+            const continueBtn = document.getElementById('terms-continue-btn');
+            
+            termsCheckbox.addEventListener('change', () => {
+                state.acceptedTerms = termsCheckbox.checked;
+                continueBtn.disabled = !termsCheckbox.checked;
+            });
+            
+            document.getElementById('terms-back-btn').addEventListener('click', () => {
+                showScreen('disclaimer-screen');
+            });
+            
+            continueBtn.addEventListener('click', () => {
+                showScreen('subscription-screen');
+            });
+        }
+
+        function initializeSubscriptionScreen() {
+            const continueBtn = document.getElementById('subscription-continue-btn');
+            
+            document.querySelectorAll('.free-plan-btn, .premium-plan-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.subscription-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                    this.closest('.subscription-card').classList.add('selected');
+                    
+                    if (this.classList.contains('free-plan-btn')) {
+                        state.selectedPlan = 'free';
+                    } else {
+                        state.selectedPlan = 'premium';
+                    }
+                    
+                    continueBtn.disabled = false;
+                });
+            });
+            
+            document.getElementById('subscription-back-btn').addEventListener('click', () => {
+                showScreen('terms-screen');
+            });
+            
+            continueBtn.addEventListener('click', () => {
+                showScreen('details-screen');
+            });
+        }
+
+        function initializeDetailsScreen() {
+            const userNameInput = document.getElementById('user-name-input');
+            const continueBtn = document.getElementById('details-continue-btn');
+            
+            userNameInput.addEventListener('input', () => {
+                state.userName = userNameInput.value.trim();
+                continueBtn.disabled = !userNameInput.value.trim();
+            });
+            
+            document.getElementById('user-email-input').addEventListener('input', () => {
+                state.userEmail = document.getElementById('user-email-input').value.trim();
+            });
+            
+            document.getElementById('details-back-btn').addEventListener('click', () => {
+                showScreen('subscription-screen');
+            });
+            
+            continueBtn.addEventListener('click', async () => {
+                // Fetch questions from the backend
+                const response = await fetch('http://localhost:3000/api/assessment/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name: state.userName, email: state.userEmail })
+                });
+                const data = await response.json();
+                
+                questionsForAssessment = data.questions;
+                assessmentId = data.assessmentId;
+
+                // Initialize state for the new assessment
+                state.answers = {};
+                state.categoryScores = {};
+                state.totalScore = 0;
+                state.categoryIndex = 0;
+                state.currentQuestionIndex = 0;
+                
+                loadQuestion();
+                showScreen('question-screen');
+            });
+        }
+
+        function loadQuestion() {
+            const categories = Object.keys(questionsForAssessment);
+            const currentCategory = categories[state.categoryIndex];
+            const questions = questionsForAssessment[currentCategory];
+            const question = questions[state.currentQuestionIndex];
+            
+            document.getElementById('category-title').textContent = currentCategory;
+            document.getElementById('question-number').textContent = `${state.currentQuestionIndex + 1} of ${questions.length}`;
+            document.getElementById('question-text').textContent = question.text;
+            document.getElementById('question-description').textContent = question.description;
+            
+            const totalQuestions = Object.values(questionsForAssessment).reduce((total, cat) => total + cat.length, 0);
+            const questionsAnswered = Object.values(state.answers).reduce((total, cat) => total + Object.keys(cat).length, 0);
+            const progressPercent = (questionsAnswered / totalQuestions) * 100;
+            
+            document.getElementById('progress-percent').textContent = `${Math.round(progressPercent)}%`;
+            document.getElementById('progress-fill').style.width = `${progressPercent}%`;
+            
+            const answerOptionsContainer = document.getElementById('answer-options');
+            answerOptionsContainer.innerHTML = '';
+            
+            question.answerOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'answer-btn';
+                
+                const scoreOption = Object.keys(question.score).find(key => key === option);
+                if (scoreOption) {
+                    if (question.score[scoreOption] === 10) {
+                        button.classList.add('yes');
+                    } else if (question.score[scoreOption] === 0) {
+                        button.classList.add('no');
+                    } else {
+                        button.classList.add('sometimes');
+                    }
+                }
+                
+                if (state.answers[currentCategory] && state.answers[currentCategory][state.currentQuestionIndex] === option) {
+                    button.classList.add('selected');
+                }
+                
+                button.innerHTML = `
+                    <i class="fas fa-${button.classList.contains('yes') ? 'check-circle' : button.classList.contains('no') ? 'times-circle' : 'minus-circle'}"></i>
+                    <span>${option}</span>
+                `;
+                
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('.answer-btn').forEach(btn => btn.classList.remove('selected'));
+                    button.classList.add('selected');
+                    
+                    if (!state.answers[currentCategory]) {
+                        state.answers[currentCategory] = {};
+                    }
+                    state.answers[currentCategory][state.currentQuestionIndex] = option;
+                    
+                    document.getElementById('next-btn').disabled = false;
+                });
+                
+                answerOptionsContainer.appendChild(button);
+            });
+            
+            document.getElementById('prev-btn').disabled = (state.categoryIndex === 0 && state.currentQuestionIndex === 0);
+            const isAnswered = state.answers[currentCategory] && state.answers[currentCategory][state.currentQuestionIndex] !== undefined;
+            document.getElementById('next-btn').disabled = !isAnswered;
+        }
+
+        function initializeQuestionScreen() {
+            document.getElementById('prev-btn').addEventListener('click', () => {
+                if (state.currentQuestionIndex > 0) {
+                    state.currentQuestionIndex--;
+                    loadQuestion();
+                } else if (state.categoryIndex > 0) {
+                    state.categoryIndex--;
+                    state.currentQuestionIndex = questionsForAssessment[Object.keys(questionsForAssessment)[state.categoryIndex]].length - 1;
+                    loadQuestion();
+                }
+            });
+            
+            document.getElementById('next-btn').addEventListener('click', async () => {
+                const categories = Object.keys(questionsForAssessment);
+                const currentCategory = categories[state.categoryIndex];
+                const questions = questionsForAssessment[currentCategory];
+                
+                if (state.currentQuestionIndex < questions.length - 1) {
+                    state.currentQuestionIndex++;
+                    loadQuestion();
+                } else if (state.categoryIndex < categories.length - 1) {
+                    state.categoryIndex++;
+                    state.currentQuestionIndex = 0;
+                    loadQuestion();
+                } else {
+                    // All questions answered, submit to backend and generate report
+                    const response = await fetch('http://localhost:3000/api/assessment/submit', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            answers: state.answers,
+                            assessmentId: assessmentId,
+                            userName: state.userName
+                        })
+                    });
+                    const reportData = await response.json();
+                    
+                    generateReport(reportData);
+                }
+            });
+            
+            document.getElementById('exit-assessment-btn').addEventListener('click', () => {
+                showScreen('welcome-screen');
+            });
+        }
+
+        function generateReport(reportData) {
+            const { overallScore, riskLevel, categoryScores, recommendations, dateCompleted, userName } = reportData;
+            
+            document.getElementById('report-user-name').textContent = userName;
+            document.getElementById('report-date').textContent = `Generated on ${dateCompleted}`;
+            document.getElementById('report-completion-date').textContent = dateCompleted;
+            
+            const overallScoreElement = document.getElementById('overall-score-circle');
+            overallScoreElement.textContent = `${overallScore}%`;
+            
+            let riskClass = 'score-low';
+            if (overallScore < 80) riskClass = 'score-medium';
+            if (overallScore < 50) riskClass = 'score-high';
+            
+            overallScoreElement.className = `score-circle ${riskClass} mx-auto mb-4`;
+            
+            const riskLevelElement = document.getElementById('risk-level');
+            riskLevelElement.textContent = riskLevel;
+            let riskBadgeClass = 'risk-low';
+            if (overallScore < 80) riskBadgeClass = 'risk-medium';
+            if (overallScore < 50) riskBadgeClass = 'risk-high';
+            riskLevelElement.className = `risk-badge ${riskBadgeClass}`;
+            
+            const categoryScoresContainer = document.getElementById('category-scores');
+            categoryScoresContainer.innerHTML = '';
+            
+            for (const category in categoryScores) {
+                const scoreData = categoryScores[category];
+                const percentScore = scoreData.score;
+                
+                let categoryRisk, categoryRiskClass;
+                if (percentScore >= 80) {
+                    categoryRisk = "Low Risk";
+                    categoryRiskClass = "risk-low";
+                } else if (percentScore >= 50) {
+                    categoryRisk = "Medium Risk";
+                    categoryRiskClass = "risk-medium";
+                } else {
+                    categoryRisk = "High Risk";
+                    categoryRiskClass = "risk-high";
+                }
+                
+                const scoreBar = document.createElement('div');
+                scoreBar.className = 'mb-3';
+                scoreBar.innerHTML = `
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm">${category}</span>
+                        <span class="text-sm font-medium">${percentScore}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${percentScore}%"></div>
+                    </div>
+                    <div class="text-right mt-1">
+                        <span class="risk-badge ${categoryRiskClass}">${categoryRisk}</span>
+                    </div>
+                `;
+                categoryScoresContainer.appendChild(scoreBar);
+            }
+            
+            const recommendationsContainer = document.getElementById('recommendations-list');
+            recommendationsContainer.innerHTML = '';
+            
+            recommendations.forEach(rec => {
+                const recommendationCard = document.createElement('div');
+                recommendationCard.className = `recommendation-card ${rec.priority.toLowerCase()}`;
+                recommendationCard.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-semibold text-lg mb-2">Improve Your ${rec.category}</h3>
+                            <p class="text-gray-700">Detailed recommendations for this category.</p>
+                        </div>
+                        <span class="risk-badge ${rec.priority.toLowerCase()}">${rec.priority}</span>
+                    </div>
+                `;
+                recommendationsContainer.appendChild(recommendationCard);
+            });
+
+            // Display the report screen
+            showScreen('report-screen');
+        }
+
+        // Initialize chatbot and UI
+        function initializeChatbot() {
+            // ... (same as previous chatbot code, no changes needed) ...
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeWelcomeScreen();
+            initializeDisclaimerScreen();
+            initializeTermsScreen();
+            initializeSubscriptionScreen();
+            initializeDetailsScreen();
+            initializeCategorySelectionScreen();
+            initializeQuestionScreen();
+            initializeChatbot();
+        });
+    </script>

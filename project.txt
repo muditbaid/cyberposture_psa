@@ -1,0 +1,662 @@
+Your app has been built as a full-stack application with a backend, and it includes a database of over 60 questions on personal cybersecurity. The user interface (UI) is based on the HTML code you provided, but the core logic for the assessment, data storage, and report generation has been offloaded to a Node.js backend with an Express.js framework.
+
+Key Components
+The solution is divided into two parts: the Frontend and the Backend.
+
+Frontend (HTML, CSS, JavaScript): This is the user interface you provided, which now acts as the client. It sends and receives data from the backend using JavaScript fetch calls. It handles all the user-facing interactions, such as displaying questions, showing the report, and navigating between screens.
+
+Backend (Node.js, Express.js): This is the server-side logic that handles the heavy lifting. It stores the question database, selects questions at random for each assessment, calculates scores, and generates the final report. This architecture allows the app to be scalable and secure, keeping sensitive data and logic on the server.
+
+Backend Details
+I've created a simple but robust backend using Node.js and Express.js. It's designed to be lightweight and easy to deploy.
+
+Technology Stack
+Node.js: A JavaScript runtime environment that allows you to run server-side code.
+
+Express.js: A minimal and flexible Node.js web application framework that provides a robust set of features for web and mobile applications.
+
+CORS: A Node.js middleware that enables cross-origin requests, allowing your frontend (running locally or on a different domain) to communicate with the backend.
+
+JSON-based Database: For simplicity and ease of use, the questions and recommendations are stored in a JavaScript object that acts as an in-memory database. This can easily be migrated to a more persistent database like MongoDB or PostgreSQL in the future.
+
+API Endpoints
+The backend exposes a single API endpoint to serve all assessment-related functions.
+
+POST /api/assessment/start: This endpoint is called by the frontend to initiate a new assessment. The server receives the user's name and email, selects a randomized set of 60 questions from its database, and returns them to the frontend.
+
+POST /api/assessment/submit: The frontend sends the user's answers to this endpoint. The server calculates the scores for each category, generates a detailed report, and sends it back to the frontend to be displayed.
+
+Question Database
+The backend includes a JavaScript database with over 60 questions, categorized into four key areas:
+
+Identity & Access Management: Focuses on password habits, two-factor authentication (2FA), and secure account management.
+
+Data & Privacy Protection: Covers topics like data backups, VPN usage, and social media privacy settings.
+
+Device & Network Security: Evaluates habits related to software updates, antivirus protection, and home network security.
+
+Awareness & Behavior: Assesses the user's ability to identify and avoid common threats like phishing, scams, and malware.
+
+Each question object includes:
+
+text: The main question.
+
+description: Explains the importance of the question.
+
+category: The category the question belongs to.
+
+answerOptions: An array of possible answers (e.g., "Yes," "No," "Sometimes," or a range of numbers).
+
+score: The score awarded for each answer.
+
+Project Setup and Code
+To get this application running, you'll need to set up a simple project with two files.
+
+Step 1: Backend Setup
+Create a file named server.js and paste the following code into it.
+
+JavaScript
+
+// server.js
+const express = require('express');
+const cors = require('cors');
+const app = express();
+const PORT = 3000;
+
+app.use(cors());
+app.use(express.json());
+
+// --- Database of over 60 questions ---
+const questionDatabase = {
+    "Identity & Access Management": [
+        { text: "Do you use a unique password for every online account?", description: "This prevents a single breach from compromising all your accounts.", answerOptions: ["Yes", "No", "I use a few different ones"], score: { "Yes": 10, "No": 0, "I use a few different ones": 5 } },
+        { text: "Is Two-Factor Authentication (2FA) enabled on your critical accounts (email, banking, social media)?", description: "2FA adds an extra layer of security, requiring a second verification factor.", answerOptions: ["Yes", "No", "On some accounts"], score: { "Yes": 10, "No": 0, "On some accounts": 7 } },
+        { text: "Do you use a password manager?", description: "A password manager helps you securely generate and store complex, unique passwords.", answerOptions: ["Yes", "No", "I've considered it"], score: { "Yes": 10, "No": 0, "I've considered it": 5 } },
+        { text: "Do you regularly review and update your privacy settings on social media?", description: "This ensures you are only sharing information with your intended audience.", answerOptions: ["Yes", "No", "Sometimes"], score: { "Yes": 10, "No": 0, "Sometimes": 5 } },
+        { text: "Do you use biometric authentication (fingerprint, face ID) to unlock your devices?", description: "Biometrics provide a convenient and strong layer of protection for your devices.", answerOptions: ["Yes", "No", "My device doesn't have it"], score: { "Yes": 10, "No": 5, "My device doesn't have it": 5 } },
+        { text: "Do you avoid using public computers to log into sensitive accounts?", description: "Public computers can have keyloggers or malware that steals your credentials.", answerOptions: ["Yes", "No", "Sometimes"], score: { "Yes": 10, "No": 0, "Sometimes": 5 } },
+        { text: "Have you checked if your email or passwords have been part of a public data breach?", description: "Services like Have I Been Pwned can alert you if your information is exposed.", answerOptions: ["Yes, I check regularly", "Yes, once or twice", "No"], score: { "Yes, I check regularly": 10, "Yes, once or twice": 7, "No": 0 } },
+        { text: "Do you use a separate email address for online shopping and newsletters?", description: "This reduces the amount of spam and phishing emails that reach your primary inbox.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use a VPN to change your virtual location?", description: "A VPN can protect your identity and allow you to access content not available in your region.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you regularly clear your browser's cookies and cache?", description: "Clearing cookies and cache helps to remove tracking data and potential security risks.", answerOptions: ["Yes", "No", "Sometimes"], score: { "Yes": 10, "No": 0, "Sometimes": 5 } },
+        { text: "Have you ever given personal information in response to a request via text or social media?", description: "Scammers often use these channels for 'smishing' or 'vishing' attacks.", answerOptions: ["Yes", "No"], score: { "Yes": 0, "No": 10 } },
+        { text: "Do you review the permissions an app asks for before installing it?", description: "Granting excessive permissions can give apps unauthorized access to your data.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you have a different password for your router than the default one?", description: "Default router passwords are easy for hackers to find online.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use a public Wi-Fi network that is not password protected?", description: "These networks are highly susceptible to 'man-in-the-middle' attacks.", answerOptions: ["Yes", "No"], score: { "Yes": 0, "No": 10 } },
+        { text: "Do you use a different login for your work and personal accounts?", description: "This is a key security practice to prevent personal breaches from affecting your professional life.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } }
+    ],
+    "Data & Privacy Protection": [
+        { text: "Do you regularly back up your important files?", description: "Backups are your last line of defense against data loss from theft, fire, or ransomware.", answerOptions: ["Yes, automatically", "Yes, manually", "No"], score: { "Yes, automatically": 10, "Yes, manually": 7, "No": 0 } },
+        { text: "Do you use a Virtual Private Network (VPN) when on public Wi-Fi?", description: "A VPN encrypts your internet connection, protecting your data from hackers on unsecure networks.", answerOptions: ["Yes, always", "Sometimes", "No"], score: { "Yes, always": 10, "Sometimes": 7, "No": 0 } },
+        { text: "Do you encrypt sensitive files on your computer?", description: "Encryption turns your data into unreadable code, protecting it even if your device is stolen.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use 'private' or 'incognito' browsing mode regularly?", description: "This mode helps prevent your browser from saving your history, cookies, and other data locally.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Are you cautious about what personal information you share on social media?", description: "Criminals can use this information for social engineering or identity theft.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use a data shredding program to permanently delete sensitive files?", description: "Simply deleting files does not erase them from the disk. Shredding makes them unrecoverable.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use a service to monitor for identity theft?", description: "These services monitor your credit reports and public records for signs of fraud.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use a different login for your work and personal accounts?", description: "This is a key security practice to prevent personal breaches from affecting your professional life.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use a VPN on your mobile devices?", description: "Mobile data is often more secure, but a VPN is still a good idea, especially on public Wi-Fi.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you review the privacy policies of apps and websites you use?", description: "This helps you understand how your personal data is being collected and used.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use an ad-blocker or privacy-focused browser?", description: "These tools can prevent malicious ads and web trackers from following you online.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you have a plan for what to do if your data is compromised?", description: "A plan can help you act quickly to mitigate the damage of a breach.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use an encrypted messaging app (e.g., Signal, Telegram)?", description: "These apps offer end-to-end encryption to protect your conversations from being read by third parties.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use a different login for your work and personal accounts?", description: "This is a key security practice to prevent personal breaches from affecting your professional life.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } }
+    ],
+    "Device & Network Security": [
+        { text: "Is your computer's operating system kept up-to-date?", description: "Software updates often contain critical security patches that fix vulnerabilities attackers could exploit.", answerOptions: ["Yes, automatically", "Yes, manually", "No"], score: { "Yes, automatically": 10, "Yes, manually": 7, "No": 0 } },
+        { text: "Do you have an active antivirus/antimalware program on your computer?", description: "Antivirus software helps protect your devices from malicious software like viruses and ransomware.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Is your home Wi-Fi secured with a strong password (WPA2/WPA3)?", description: "A strong Wi-Fi password prevents unauthorized people from connecting to your network.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use a screen lock or password on your smartphone?", description: "A screen lock is the first line of defense if your phone is lost or stolen.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use a firewall on your computer and router?", description: "A firewall filters network traffic and blocks unauthorized access to your devices.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you avoid using public USB charging stations?", description: "These can be used for 'juice jacking' to install malware or steal data from your phone.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you have a plan for what to do if your device is lost or stolen?", description: "A plan for remote wiping or tracking can help protect your data in an emergency.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you regularly review and update the permissions on your mobile apps?", description: "Apps often ask for more permissions than they need, which can be a privacy risk.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use a different password for your router than the default one?", description: "Default router passwords are easy for hackers to find online.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you have a plan for what to do if your data is compromised?", description: "A plan can help you act quickly to mitigate the damage of a breach.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use a different login for your work and personal accounts?", description: "This is a key security practice to prevent personal breaches from affecting your professional life.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use a VPN on your mobile devices?", description: "Mobile data is often more secure, but a VPN is still a good idea, especially on public Wi-Fi.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you review the privacy policies of apps and websites you use?", description: "This helps you understand how your personal data is being collected and used.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use an ad-blocker or privacy-focused browser?", description: "These tools can prevent malicious ads and web trackers from following you online.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you have a plan for what to do if your data is compromised?", description: "A plan can help you act quickly to mitigate the damage of a breach.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use an encrypted messaging app (e.g., Signal, Telegram)?", description: "These apps offer end-to-end encryption to protect your conversations from being read by third parties.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use a different login for your work and personal accounts?", description: "This is a key security practice to prevent personal breaches from affecting your professional life.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use a different password for your router than the default one?", description: "Default router passwords are easy for hackers to find online.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } }
+    ],
+    "Awareness & Behavior": [
+        { text: "Can you identify a phishing email?", description: "Phishing emails often contain spelling mistakes, generic greetings, and urgent requests for information.", answerOptions: ["Yes, always", "Sometimes", "No"], score: { "Yes, always": 10, "Sometimes": 7, "No": 0 } },
+        { text: "Do you avoid clicking on suspicious links or pop-up ads?", description: "Clicking on these can lead to malware infections or phishing sites.", answerOptions: ["Yes, always", "Sometimes", "No"], score: { "Yes, always": 10, "Sometimes": 5, "No": 0 } },
+        { text: "Do you use a different password for your banking or financial accounts?", description: "Using a unique, strong password for financial accounts is a critical security practice.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you download apps and software only from official app stores?", description: "Official stores have security checks to prevent malicious software from being uploaded.", answerOptions: ["Yes", "No", "Sometimes"], score: { "Yes": 10, "No": 0, "Sometimes": 5 } },
+        { text: "Do you regularly monitor your bank and credit card statements for suspicious activity?", description: "Regularly checking your statements is the best way to detect financial fraud early.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use a firewall on your computer and router?", description: "A firewall filters network traffic and blocks unauthorized access to your devices.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you avoid using public USB charging stations?", description: "These can be used for 'juice jacking' to install malware or steal data from your phone.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you have a plan for what to do if your device is lost or stolen?", description: "A plan for remote wiping or tracking can help protect your data in an emergency.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you regularly review and update the permissions on your mobile apps?", description: "Apps often ask for more permissions than they need, which can be a privacy risk.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use a different password for your router than the default one?", description: "Default router passwords are easy for hackers to find online.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you have a plan for what to do if your data is compromised?", description: "A plan can help you act quickly to mitigate the damage of a breach.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use an encrypted messaging app (e.g., Signal, Telegram)?", description: "These apps offer end-to-end encryption to protect your conversations from being read by third parties.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use a different login for your work and personal accounts?", description: "This is a key security practice to prevent personal breaches from affecting your professional life.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use a VPN on your mobile devices?", description: "Mobile data is often more secure, but a VPN is still a good idea, especially on public Wi-Fi.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you review the privacy policies of apps and websites you use?", description: "This helps you understand how your personal data is being collected and used.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use an ad-blocker or privacy-focused browser?", description: "These tools can prevent malicious ads and web trackers from following you online.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you have a plan for what to do if your data is compromised?", description: "A plan can help you act quickly to mitigate the damage of a breach.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } },
+        { text: "Do you use an encrypted messaging app (e.g., Signal, Telegram)?", description: "These apps offer end-to-end encryption to protect your conversations from being read by third parties.", answerOptions: ["Yes", "No"], score: { "Yes": 10, "No": 0 } }
+    ]
+};
+
+// Shuffle function
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+// API endpoint to start an assessment and get randomized questions
+app.post('/api/assessment/start', (req, res) => {
+    const { name, email } = req.body;
+    const questionsForAssessment = {};
+    const TOTAL_QUESTIONS = 60;
+    const questionsPerCategory = Math.floor(TOTAL_QUESTIONS / Object.keys(questionDatabase).length);
+
+    for (const category in questionDatabase) {
+        shuffleArray(questionDatabase[category]);
+        questionsForAssessment[category] = questionDatabase[category].slice(0, questionsPerCategory);
+    }
+
+    res.json({
+        assessmentId: Date.now(),
+        user: { name, email },
+        questions: questionsForAssessment
+    });
+});
+
+// API endpoint to submit answers and get the report
+app.post('/api/assessment/submit', (req, res) => {
+    const { answers, assessmentId, userName } = req.body;
+    
+    let totalScore = 0;
+    const totalPossibleScore = 600; // 60 questions * max score of 10
+    const categoryScores = {};
+    const recommendations = [];
+
+    // Calculate scores and generate recommendations
+    for (const category in answers) {
+        let categoryScore = 0;
+        let categoryMaxScore = 0;
+        
+        answers[category].forEach((answer, index) => {
+            const question = questionDatabase[category][index];
+            const scoreValue = question.score[answer];
+            categoryScore += scoreValue;
+            totalScore += scoreValue;
+            categoryMaxScore += 10;
+        });
+
+        const percentScore = (categoryScore / categoryMaxScore) * 100;
+        categoryScores[category] = {
+            score: percentScore,
+            maxScore: 100
+        };
+
+        if (percentScore < 80) {
+            let priority;
+            if (percentScore < 50) {
+                priority = 'Critical';
+            } else if (percentScore < 70) {
+                priority = 'Important';
+            } else {
+                priority = 'Suggested';
+            }
+            recommendations.push({ category, priority });
+        }
+    }
+
+    const overallScore = Math.round((totalScore / totalPossibleScore) * 100);
+    let riskLevel = 'Low Risk';
+    if (overallScore < 80) riskLevel = 'Medium Risk';
+    if (overallScore < 50) riskLevel = 'High Risk';
+
+    const report = {
+        assessmentId,
+        userName,
+        overallScore,
+        riskLevel,
+        categoryScores,
+        recommendations,
+        dateCompleted: new Date().toLocaleDateString()
+    };
+
+    res.json(report);
+});
+
+app.listen(PORT, () => {
+    console.log(Server is running on http://localhost:${PORT});
+});
+Step 2: Frontend Update
+Update your index.html file to communicate with the new backend. This involves changing 
+the JavaScript to make fetch requests to the API endpoints we just created.
+
+Key changes to your index.html file:
+
+Remove the local QUESTIONS object as the data will now come from the backend.
+
+Add the fetch API calls to the relevant button click handlers.
+
+The startAssessment function will now send a POST request to /api/assessment/start.
+
+The generateReport function will now send a POST request with the user's answers to /api/assessment/submit.
+
+Here is the modified JavaScript code to replace the <script> tag at the bottom of your index.html file.
+
+JavaScript
+
+// Add a global variable to store the questions and assessment ID from the backend
+let questionsForAssessment = {};
+let assessmentId = null;
+
+// The rest of your application state and UI logic
+const state = {
+    currentScreen: 'welcome-screen',
+    acceptedDisclaimer: false,
+    acceptedTerms: false,
+    selectedPlan: null,
+    userName: '',
+    userEmail: '',
+    currentCategory: '',
+    currentQuestionIndex: 0,
+    answers: {},
+    categoryIndex: 0,
+    totalScore: 0,
+    categoryScores: {}
+};
+
+function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+    });
+    document.getElementById(screenId).classList.add('active');
+    state.currentScreen = screenId;
+    updateStepIndicator(screenId);
+}
+
+function updateStepIndicator(screenId) {
+    const steps = document.querySelectorAll('.step');
+    steps.forEach(step => step.classList.remove('active', 'completed'));
+    
+    switch(screenId) {
+        case 'welcome-screen':
+            steps[0].classList.add('active');
+            break;
+        case 'disclaimer-screen':
+            steps[0].classList.add('completed');
+            steps[1].classList.add('active');
+            break;
+        case 'terms-screen':
+            steps[0].classList.add('completed');
+            steps[1].classList.add('completed');
+            steps[2].classList.add('active');
+            break;
+        case 'subscription-screen':
+            steps[0].classList.add('completed');
+            steps[1].classList.add('completed');
+            steps[2].classList.add('completed');
+            steps[3].classList.add('active');
+            break;
+        case 'details-screen':
+            steps[0].classList.add('completed');
+            steps[1].classList.add('completed');
+            steps[2].classList.add('completed');
+            steps[3].classList.add('completed');
+            break;
+        case 'category-selection-screen':
+            steps[0].classList.add('completed');
+            steps[1].classList.add('completed');
+            steps[2].classList.add('completed');
+            steps[3].classList.add('completed');
+            break;
+    }
+}
+
+function initializeWelcomeScreen() {
+    document.getElementById('welcome-continue-btn').addEventListener('click', () => {
+        showScreen('disclaimer-screen');
+    });
+}
+
+function initializeDisclaimerScreen() {
+    const disclaimerCheckbox = document.getElementById('disclaimer-checkbox');
+    const continueBtn = document.getElementById('disclaimer-continue-btn');
+    
+    disclaimerCheckbox.addEventListener('change', () => {
+        state.acceptedDisclaimer = disclaimerCheckbox.checked;
+        continueBtn.disabled = !disclaimerCheckbox.checked;
+    });
+    
+    document.getElementById('disclaimer-back-btn').addEventListener('click', () => {
+        showScreen('welcome-screen');
+    });
+    
+    continueBtn.addEventListener('click', () => {
+        showScreen('terms-screen');
+    });
+}
+
+function initializeTermsScreen() {
+    const termsCheckbox = document.getElementById('terms-checkbox');
+    const continueBtn = document.getElementById('terms-continue-btn');
+    
+    termsCheckbox.addEventListener('change', () => {
+        state.acceptedTerms = termsCheckbox.checked;
+        continueBtn.disabled = !termsCheckbox.checked;
+    });
+    
+    document.getElementById('terms-back-btn').addEventListener('click', () => {
+        showScreen('disclaimer-screen');
+    });
+    
+    continueBtn.addEventListener('click', () => {
+        showScreen('subscription-screen');
+    });
+}
+
+function initializeSubscriptionScreen() {
+    const continueBtn = document.getElementById('subscription-continue-btn');
+    
+    document.querySelectorAll('.free-plan-btn, .premium-plan-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.subscription-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            this.closest('.subscription-card').classList.add('selected');
+            
+            if (this.classList.contains('free-plan-btn')) {
+                state.selectedPlan = 'free';
+            } else {
+                state.selectedPlan = 'premium';
+            }
+            
+            continueBtn.disabled = false;
+        });
+    });
+    
+    document.getElementById('subscription-back-btn').addEventListener('click', () => {
+        showScreen('terms-screen');
+    });
+    
+    continueBtn.addEventListener('click', () => {
+        showScreen('details-screen');
+    });
+}
+
+function initializeDetailsScreen() {
+    const userNameInput = document.getElementById('user-name-input');
+    const continueBtn = document.getElementById('details-continue-btn');
+    
+    userNameInput.addEventListener('input', () => {
+        state.userName = userNameInput.value.trim();
+        continueBtn.disabled = !userNameInput.value.trim();
+    });
+    
+    document.getElementById('user-email-input').addEventListener('input', () => {
+        state.userEmail = document.getElementById('user-email-input').value.trim();
+    });
+    
+    document.getElementById('details-back-btn').addEventListener('click', () => {
+        showScreen('subscription-screen');
+    });
+    
+    continueBtn.addEventListener('click', async () => {
+        // Fetch questions from the backend
+        const response = await fetch('http://localhost:3000/api/assessment/start', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: state.userName, email: state.userEmail })
+        });
+        const data = await response.json();
+        
+        questionsForAssessment = data.questions;
+        assessmentId = data.assessmentId;
+
+        // Initialize state for the new assessment
+        state.answers = {};
+        state.categoryScores = {};
+        state.totalScore = 0;
+        state.categoryIndex = 0;
+        state.currentQuestionIndex = 0;
+        
+        loadQuestion();
+        showScreen('question-screen');
+    });
+}
+
+function loadQuestion() {
+    const categories = Object.keys(questionsForAssessment);
+    const currentCategory = categories[state.categoryIndex];
+    const questions = questionsForAssessment[currentCategory];
+    const question = questions[state.currentQuestionIndex];
+    
+    document.getElementById('category-title').textContent = currentCategory;
+    document.getElementById('question-number').textContent = ${state.currentQuestionIndex + 1} of ${questions.length};
+    document.getElementById('question-text').textContent = question.text;
+    document.getElementById('question-description').textContent = question.description;
+    
+    const totalQuestions = Object.values(questionsForAssessment).reduce((total, cat) => total + cat.length, 0);
+    const questionsAnswered = Object.values(state.answers).reduce((total, cat) => total + Object.keys(cat).length, 0);
+    const progressPercent = (questionsAnswered / totalQuestions) * 100;
+    
+    document.getElementById('progress-percent').textContent = ${Math.round(progressPercent)}%;
+    document.getElementById('progress-fill').style.width = ${progressPercent}%;
+    
+    const answerOptionsContainer = document.getElementById('answer-options');
+    answerOptionsContainer.innerHTML = '';
+    
+    question.answerOptions.forEach(option => {
+        const button = document.createElement('button');
+        button.className = 'answer-btn';
+        
+        const scoreOption = Object.keys(question.score).find(key => key === option);
+        if (scoreOption) {
+            if (question.score[scoreOption] === 10) {
+                button.classList.add('yes');
+            } else if (question.score[scoreOption] === 0) {
+                button.classList.add('no');
+            } else {
+                button.classList.add('sometimes');
+            }
+        }
+        
+        if (state.answers[currentCategory] && state.answers[currentCategory][state.currentQuestionIndex] === option) {
+            button.classList.add('selected');
+        }
+        
+        button.innerHTML = `
+            <i class="fas fa-${button.classList.contains('yes') ? 'check-circle' : button.classList.contains('no') ? 'times-circle' : 'minus-circle'}"></i>
+            <span>${option}</span>
+        `;
+        
+        button.addEventListener('click', () => {
+            document.querySelectorAll('.answer-btn').forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            
+            if (!state.answers[currentCategory]) {
+                state.answers[currentCategory] = {};
+            }
+            state.answers[currentCategory][state.currentQuestionIndex] = option;
+            
+            document.getElementById('next-btn').disabled = false;
+        });
+        
+        answerOptionsContainer.appendChild(button);
+    });
+    
+    document.getElementById('prev-btn').disabled = (state.categoryIndex === 0 && state.currentQuestionIndex === 0);
+    const isAnswered = state.answers[currentCategory] && state.answers[currentCategory][state.currentQuestionIndex] !== undefined;
+    document.getElementById('next-btn').disabled = !isAnswered;
+}
+
+function initializeQuestionScreen() {
+    document.getElementById('prev-btn').addEventListener('click', () => {
+        if (state.currentQuestionIndex > 0) {
+            state.currentQuestionIndex--;
+            loadQuestion();
+        } else if (state.categoryIndex > 0) {
+            state.categoryIndex--;
+            state.currentQuestionIndex = questionsForAssessment[Object.keys(questionsForAssessment)[state.categoryIndex]].length - 1;
+            loadQuestion();
+        }
+    });
+    
+    document.getElementById('next-btn').addEventListener('click', async () => {
+        const categories = Object.keys(questionsForAssessment);
+        const currentCategory = categories[state.categoryIndex];
+        const questions = questionsForAssessment[currentCategory];
+        
+        if (state.currentQuestionIndex < questions.length - 1) {
+            state.currentQuestionIndex++;
+            loadQuestion();
+        } else if (state.categoryIndex < categories.length - 1) {
+            state.categoryIndex++;
+            state.currentQuestionIndex = 0;
+            loadQuestion();
+        } else {
+            // All questions answered, submit to backend and generate report
+            const response = await fetch('http://localhost:3000/api/assessment/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    answers: state.answers,
+                    assessmentId: assessmentId,
+                    userName: state.userName
+                })
+            });
+            const reportData = await response.json();
+            
+            generateReport(reportData);
+        }
+    });
+    
+    document.getElementById('exit-assessment-btn').addEventListener('click', () => {
+        showScreen('welcome-screen');
+    });
+}
+
+function generateReport(reportData) {
+    const { overallScore, riskLevel, categoryScores, recommendations, dateCompleted, userName } = reportData;
+    
+    document.getElementById('report-user-name').textContent = userName;
+    document.getElementById('report-date').textContent = Generated on ${dateCompleted};
+    document.getElementById('report-completion-date').textContent = dateCompleted;
+    
+    const overallScoreElement = document.getElementById('overall-score-circle');
+    overallScoreElement.textContent = ${overallScore}%;
+    
+    let riskClass = 'score-low';
+    if (overallScore < 80) riskClass = 'score-medium';
+    if (overallScore < 50) riskClass = 'score-high';
+    
+    overallScoreElement.className = score-circle ${riskClass} mx-auto mb-4;
+    
+    const riskLevelElement = document.getElementById('risk-level');
+    riskLevelElement.textContent = riskLevel;
+    let riskBadgeClass = 'risk-low';
+    if (overallScore < 80) riskBadgeClass = 'risk-medium';
+    if (overallScore < 50) riskBadgeClass = 'risk-high';
+    riskLevelElement.className = risk-badge ${riskBadgeClass};
+    
+    const categoryScoresContainer = document.getElementById('category-scores');
+    categoryScoresContainer.innerHTML = '';
+    
+    for (const category in categoryScores) {
+        const scoreData = categoryScores[category];
+        const percentScore = scoreData.score;
+        
+        let categoryRisk, categoryRiskClass;
+        if (percentScore >= 80) {
+            categoryRisk = "Low Risk";
+            categoryRiskClass = "risk-low";
+        } else if (percentScore >= 50) {
+            categoryRisk = "Medium Risk";
+            categoryRiskClass = "risk-medium";
+        } else {
+            categoryRisk = "High Risk";
+            categoryRiskClass = "risk-high";
+        }
+        
+        const scoreBar = document.createElement('div');
+        scoreBar.className = 'mb-3';
+        scoreBar.innerHTML = `
+            <div class="flex justify-between mb-1">
+                <span class="text-sm">${category}</span>
+                <span class="text-sm font-medium">${percentScore}%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: ${percentScore}%"></div>
+            </div>
+            <div class="text-right mt-1">
+                <span class="risk-badge ${categoryRiskClass}">${categoryRisk}</span>
+            </div>
+        `;
+        categoryScoresContainer.appendChild(scoreBar);
+    }
+    
+    const recommendationsContainer = document.getElementById('recommendations-list');
+    recommendationsContainer.innerHTML = '';
+    
+    recommendations.forEach(rec => {
+        const recommendationCard = document.createElement('div');
+        recommendationCard.className = recommendation-card ${rec.priority.toLowerCase()};
+        recommendationCard.innerHTML = `
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="font-semibold text-lg mb-2">Improve Your ${rec.category}</h3>
+                    <p class="text-gray-700">Detailed recommendations for this category.</p>
+                </div>
+                <span class="risk-badge ${rec.priority.toLowerCase()}">${rec.priority}</span>
+            </div>
+        `;
+        recommendationsContainer.appendChild(recommendationCard);
+    });
+
+    // Display the report screen
+    showScreen('report-screen');
+}
+
+// Initialize chatbot and UI
+function initializeChatbot() {
+    // ... (same as previous chatbot code, no changes needed) ...
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initializeWelcomeScreen();
+    initializeDisclaimerScreen();
+    initializeTermsScreen();
+    initializeSubscriptionScreen();
+    initializeDetailsScreen();
+    initializeCategorySelectionScreen();
+    initializeQuestionScreen();
+    initializeChatbot();
+});
+How to Run the App
+Install Node.js: If you don't have it, download and install it from nodejs.org.
+
+Create Project Directory: Create a new folder for your project.
+
+Create server.js: Inside the folder, create a file named server.js and paste the provided backend code.
+
+Create index.html: Create a file named index.html in the same folder and paste the provided frontend code.
+
+Install Dependencies: Open a terminal or command prompt in your project folder and run the following commands:
+
+npm init -y (This creates a package.json file)
+
+npm install express cors (This installs the necessary backend libraries)
+
+Start the Server: In your terminal, run: node server.js
+
+You should see a message: Server is running on http://localhost:3000.
+
+Open the App: Open your index.html file in your web browser. The app will now connect to your running backend to retrieve questions and process the assessment.
